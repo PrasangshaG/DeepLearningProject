@@ -97,3 +97,33 @@ def SingleImage_Vulnerability_Allp(test_item, test_class, model):
             break
 
     return tensor_im, prti[i], actual_label, kl, i
+
+
+def all_pixel_gaussian_sample(test_loader, model, sample_size=20):
+    imlst = []
+    imdict = {}
+    idlist = []
+    idi = 0
+    for img, img_class in test_loader:
+        imlst.append(img)
+        imdict[img] = img_class
+        idlist.append(idi)
+        idi += 1
+
+    images_perturb_vals3 = {}
+    images_labels = {}
+
+    for i in range(sample_size):
+        idx = random.sample(idlist, 1)[0]
+        # print(idx)
+        idlist.remove(idx)
+        im = imlst[idx]
+        im_cl = imdict[im]
+        k = 1
+        actual_image, perturbed_image, actual_label, perturbed_label, mnb = SingleImage_Vulnerability_Allp(
+            im, im_cl, model)
+        images_perturb_vals3[idx] = k*mnb
+
+    plot_results(images_perturb_vals3, "Attack 2: Contiguous $k$-pixel attack")
+
+    return images_perturb_vals3
